@@ -20,20 +20,24 @@ var JobDetails = {
 ///////////////////////////////////////Executenow section /////////////////////////////
 app.post('/executenow', (req, res) => {
 
-    var requireData = {
-        'User': '',
-        'Password': '',
-        'iP': '',
-        'destination': ''
-    }
-    requireData.destination = (req.body.type).toUpperCase();
-    requireData.User = req.body.user;
-    requireData.Password = req.body.password;
-    requireData.iP = req.body.ip;
+
 
     //////////////////////////////////R-Box section///////////////////////////////////////////
 
-    if ((requireData.hasOwnProperty('User')) && (requireData.hasOwnProperty('Password')) && (requireData.hasOwnProperty('iP')) && (requireData.hasOwnProperty('destination'))) {
+    if (((req.body).hasOwnProperty('User')) && ((req.body).hasOwnProperty('Password')) && ((req.body).hasOwnProperty('iP')) && ((req.body).hasOwnProperty('destination'))) {
+
+        var requireData = {
+            'User': '',
+            'Password': '',
+            'iP': '',
+            'destination': ''
+        }
+
+        requireData.destination = (req.body.type).toUpperCase();
+        requireData.User = req.body.user;
+        requireData.Password = req.body.password;
+        requireData.iP = req.body.ip;
+
         if (requireData.destination == 'RBOX') {
             request.post('http://' + requireData.iP + ':' + config.port + '/restart', {
                 json: {
@@ -63,22 +67,33 @@ app.post('/executenow', (req, res) => {
                     }
                 }
             })
+        } else {
+            console.log("Request not found !!!");
+            res.status(404).send('Request not found !!!')
         }
         //////////////////////////////////////////////////Pbox section////////////////
 
-        else if (requireData.destination == 'PBOX') {
+    } else if (((req.body).hasOwnProperty('iP')) && ((req.body).hasOwnProperty('destination'))) {
+        if (requireData.destination == 'PBOX') {
+            var pboxError = null;
             // var child = cp.spawn('pm2', ['restart', 'ecosystem.config.js', '--env', 'production'], { cwd: "/home/padmin/build/pm2_config" });
             var child = cp.spawn('ls', ['-a']);
             child.stderr.on('error', error => {
                 console.log('error', error);
+                pboxError = error;
             });
             child.on('close', (code) => {
-                console.log("P-Box is executed successfully" + code + " !!!");
-                res.status(200).send("P-Box is executed successfully !!!");
+                if (pboxError == error) {
+                    console.log("P-Box is not executed  !!!");
+                    res.status(400).send("P-Box is not executed !!!");
+                } else {
+                    console.log("P-Box is executed successfully" + code + " !!!");
+                    res.status(200).send("P-Box is executed successfully !!!");
+                }
             });
         } else {
-            console.log("Request not matched !!!");
-            res.status(404).send.json("Request not matched !!!");
+            console.log("Request not found !!!");
+            res.status(404).send.json("Request not found !!!");
         }
     } else {
         console.log("Request not matched !!!");
@@ -102,44 +117,40 @@ app.post('/schedulenow', (req, res) => {
         'pboxIP': null,
         'User': null,
         'Password': null,
-        'id' : null
+        'id': null
     }
-    scheduleRequire.destination = (req.body.type).toUpperCase();
-    scheduleRequire.RboxIP = req.body.rboxIP;
-    scheduleRequire.PboxIP = req.body.pboxIP;
-    scheduleRequire.minut = req.body.minut;
-    scheduleRequire.hour = req.body.hour;
-    scheduleRequire.date = req.body.date;
-    scheduleRequire.month = req.body.month;
-    scheduleRequire.day = req.body.day;
-    scheduleRequire.Pbox_JobID = req.body.pboxJobID;
-    scheduleRequire.Rbox_JobID = req.body.rboxJobID;
-    scheduleRequire.User = req.body.user;
-    scheduleRequire.rbox_JobID = req.body.rJobID;
-    scheduleRequire.pbox_JobID = req.body.pJobID
-    scheduleRequire.Password = req.body.password;
     
 
-    /////////////////////////////////////////P-BOX Scheduling /////////////////////////
 
-    if (scheduleRequire.destination == 'SCHEDULEPBOX') {
-        schedulePboxIP = scheduleRequire.PboxIP;
-        JobDetails.Pbox_JobID = scheduleRequire.pbox_JobID;
-       
-        if ((scheduleRequire.hasOwnProperty('PboxIP')) && (scheduleRequire.hasOwnProperty('id')) && (scheduleRequire.hasOwnProperty('minut')) && (scheduleRequire.hasOwnProperty('hour')) && (scheduleRequire.hasOwnProperty('date')) && (scheduleRequire.hasOwnProperty('month')) && scheduleRequire.hasOwnProperty('day')) {
+
+    /////////////////////////////////////////P-BOX Scheduling /////////////////////////
+    if ((req.body).hasOwnProperty('pboxIP') && ((req.body).hasOwnProperty('pboxJobID')) && ((req.body).hasOwnProperty('minut')) && ((req.body).hasOwnProperty('hour')) && ((req.body).hasOwnProperty('date')) && ((req.body).hasOwnProperty('month')) && ((req.body).hasOwnProperty('day'))) {
+
+        scheduleRequire.destination = (req.body.type).toUpperCase();
+        scheduleRequire.PboxIP = req.body.pboxIP;
+        scheduleRequire.minut = req.body.minut;
+        scheduleRequire.hour = req.body.hour;
+        scheduleRequire.date = req.body.date;
+        scheduleRequire.month = req.body.month;
+        scheduleRequire.day = req.body.day;
+        scheduleRequire.Pbox_JobID = req.body.pboxJobID;
+        if (scheduleRequire.destination == 'SCHEDULEPBOX') {
+            schedulePboxIP = scheduleRequire.PboxIP;
+            JobDetails.Pbox_JobID = scheduleRequire.pbox_JobID;
+
             dateValidateP = (scheduleRequire.minut + ' ' + scheduleRequire.hour + ' ' + scheduleRequire.date + ' ' + scheduleRequire.month + ' ' + scheduleRequire.day);
             var checkScheduler = scheduler.validate(dateValidateP);
 
             if (checkScheduler == false) {
-                console.log('Reboot request for P-Box on IP ' + schedulePboxIP + ' is not accepted');
-                res.status(200).send('Reboot request for P-Box on ' + schedulePboxIP + ' is not accepted');
+                console.log('Request for P-Box on IP ' + schedulePboxIP + ' not accepted');
+                res.status(404).send('Request for P-Box on ' + schedulePboxIP + ' not accepted');
             } else {
                 console.log('Reboot request for P-Box on IP' + schedulePboxIP + ' is accepted ');
                 res.status(200).send('Reboot request for P-Box on IP' + schedulePboxIP + ' is accepted ');
                 jobPbox = scheduler.schedule(dateValidateP, () => {
                     // var child = cp.spawn('pm2', ['restart', 'ecosystem.config.js', '--env', 'production'], { cwd: "/home/padmin/build/pm2_config" });
                     var child = cp.spawn('ls', ['-a'])
-                    child.stdout.on('data', data =>{
+                    child.stdout.on('data', data => {
                         console.log(data);
                     })
                     child.stderr.on('error', error => {
@@ -148,43 +159,65 @@ app.post('/schedulenow', (req, res) => {
                 });
 
             }
+        } else {
+            console.log('Request for P-Box on IP ' + schedulePboxIP + ' not accepted ');
+            res.status(400).send('Request for P-Box on IP ' + schedulePboxIP + ' not accepted ');
         }
+
         /////////////////////////////////////////Schedule R-Box ////////////////////////////////
 
-    } else if (scheduleRequire.destination == 'SCHEDULERBOX') {
-        scheduleRboxIP = scheduleRequire.RboxIP;
-        JobDetails.Rbox_JobID  = scheduleRequire.rbox_JobID;
+    } else if ((req.body).hasOwnProperty('rboxIP') && ((req.body).hasOwnProperty('rboxJobID')) && ((req.body).hasOwnProperty('minut')) && ((req.body).hasOwnProperty('hour')) && ((req.body).hasOwnProperty('date')) && ((req.body).hasOwnProperty('month')) && ((req.body).hasOwnProperty('day')) && ((req.body).hasOwnProperty('user')) && ((req.body).hasOwnProperty('password'))) {
+
+        scheduleRequire.destination = (req.body.type).toUpperCase();
+        scheduleRequire.RboxIP = req.body.rboxIP;
+        scheduleRequire.Rbox_JobID = req.body.rboxJobID;
+        scheduleRequire.User = req.body.user;
+        scheduleRequire.Password = req.body.password;
+        scheduleRequire.minut = req.body.minut;
+        scheduleRequire.hour = req.body.hour;
+        scheduleRequire.date = req.body.date;
+        scheduleRequire.month = req.body.month;
+        scheduleRequire.day = req.body.day;
         
-        if ((scheduleRequire.hasOwnProperty('RboxIP')) && (scheduleRequire.hasOwnProperty('Rbox_JobID')) && (scheduleRequire.hasOwnProperty('minut')) && (scheduleRequire.hasOwnProperty('hour')) && (scheduleRequire.hasOwnProperty('day')) && (scheduleRequire.hasOwnProperty('month')) && scheduleRequire.hasOwnProperty('day')) {
-            dateValidateR = (scheduleRequire.minut + ' ' + scheduleRequire.hour + ' ' + scheduleRequire.date + ' ' + scheduleRequire.month + ' ' + scheduleRequire.day);
-            var checkScheduler = scheduler.validate(dateValidateR);
 
-            if (checkScheduler == false) {
-                console.log('Reboot request for R-Box is not scheduled');
-                res.status(404).send('Reboot request for R-Box is not scheduled');
-            } else {
-                console.log('Reboot request for R-Box on IP ' + scheduleRboxIP + 'is scheduled on time ' + dateValidateR);
-                res.status(200).send('Reboot request for R-Box on IP ' + scheduleRboxIP + 'is scheduled on time ' + dateValidateR);
-                jobRbox = scheduler.schedule(dateValidateR, () => {
+        if (scheduleRequire.destination == 'SCHEDULERBOX') {
+            scheduleRboxIP = scheduleRequire.RboxIP;
+            JobDetails.Rbox_JobID = scheduleRequire.rbox_JobID;
 
-                    request.post('http://' + scheduleRboxIP + ':' + config.port + '/restart', {
-                        json: {
-                            "user": scheduleRequire.User,
-                            "password": scheduleRequire.Password,
-                            "iP": scheduleRboxIP
-                        }
+            if ((scheduleRequire.hasOwnProperty('RboxIP')) && (scheduleRequire.hasOwnProperty('Rbox_JobID')) && (scheduleRequire.hasOwnProperty('minut')) && (scheduleRequire.hasOwnProperty('hour')) && (scheduleRequire.hasOwnProperty('day')) && (scheduleRequire.hasOwnProperty('month')) && scheduleRequire.hasOwnProperty('day')) {
+                dateValidateR = (scheduleRequire.minut + ' ' + scheduleRequire.hour + ' ' + scheduleRequire.date + ' ' + scheduleRequire.month + ' ' + scheduleRequire.day);
+                var checkScheduler = scheduler.validate(dateValidateR);
+
+                if (checkScheduler == false) {
+                    console.log('Reboot request for R-Box is not scheduled');
+                    res.status(404).send('Reboot request for R-Box is not scheduled');
+                } else {
+                    console.log('Reboot request for R-Box on IP ' + scheduleRboxIP + 'is scheduled on time ' + dateValidateR);
+                    res.status(200).send('Reboot request for R-Box on IP ' + scheduleRboxIP + 'is scheduled on time ' + dateValidateR);
+                    jobRbox = scheduler.schedule(dateValidateR, () => {
+
+                        request.post('http://' + scheduleRboxIP + ':' + config.port + '/restart', {
+                            json: {
+                                "user": scheduleRequire.User,
+                                "password": scheduleRequire.Password,
+                                "iP": scheduleRboxIP
+                            }
+                        })
                     })
-                })
+                }
+            } else {
+                console.log('Reboot request for R-Box on IP ' + scheduleRboxIP + ' is not accepted');
+                res.status(404).send('Reboot request for R-Box  on IP ' + scheduleRboxIP + ' is not accepted');
             }
         } else {
-            console.log('Reboot request for R-Box on IP ' + scheduleRboxIP + ' is not accepted');
-            res.status(404).send('Reboot request for R-Box  on IP ' + scheduleRboxIP + ' is not accepted');
+            console.log('Please check entered date and time value');
+            res.status(404).send('Please check entered date and time value');
         }
-    } else {
-        console.log('Please check entered date and time value');
-        res.status(404).send('Please check entered date and time value');
+    }else{
+        console.log('Request for R-Box on IP ' + scheduleRboxIP + ' not accepted');
+        res.status(404).send('Request for R-Box  on IP ' + scheduleRboxIP + ' not accepted');
     }
-});
+    });
 ///////////////////////////////////////STOP P-Box //////////////////////////////////////////////////
 app.post('/cancel', (req, res) => {
     var destination = (req.body.type).toUpperCase();
@@ -227,7 +260,7 @@ app.post('/retrivenow', (req, res) => {
     var iPR = req.body.rboxip;
     var iPP = req.body.pboxip;
     var responseFromServer = null
-   
+
     //////////////////////////////retrive scheduling of all/////////////////////////////
     if ((destination == 'ALL') && (schedulePboxIP == iPP) && (scheduleRboxIP == iPR)) {
         console.log(JobDetails.Rbox_JobID)
@@ -239,7 +272,7 @@ app.post('/retrivenow', (req, res) => {
                 console.log(responseFromServer);
 
             } else {
-                responseFromServer = "P-Box is not scheduled  on I.P. " + iPP +" !  ";
+                responseFromServer = "P-Box is not scheduled  on I.P. " + iPP + " !  ";
                 console.log(responseFromServer);
             }
 
@@ -248,7 +281,7 @@ app.post('/retrivenow', (req, res) => {
                 res.status(200).send(responseFromServer + '  ' + "R-Box is scheduled  on I.P. " + iPR + "  Job id: " + JobDetails.Rbox_JobID + " on time :" + dateValidateR);
 
             } else {
-                console.log("R-Box is not scheduled  on I.P. " + iPR +" !");
+                console.log("R-Box is not scheduled  on I.P. " + iPR + " !");
                 res.status(404).send('scheduled job not found  !!!');
             }
 
@@ -267,7 +300,7 @@ app.post('/retrivenow', (req, res) => {
 
         }
         //////////////////////////retrivr schedling of R-Box ///////////////////////
-    }else if (destination == 'SCHEDULERBOX') {
+    } else if (destination == 'SCHEDULERBOX') {
         console.log(JobDetails.Rbox_JobID);
         if (JobDetails.Rbox_JobID != null) {
             console.log("R-Box is scheduled  on I.P. " + iPR + "  Job id: " + JobDetails.Rbox_JobID + " on time " + dateValidateR);
