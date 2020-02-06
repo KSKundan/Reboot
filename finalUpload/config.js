@@ -1,0 +1,1 @@
+module.exports ={ port :  process.env.PORT || 3200, ip : '172.16.50.175',pboxIP :'172.16.50.145', portPbox : process.env.PORT ||6010, cmd : 'pm2', cmdArgs1 : 'restart', cmdArgs2 :'ecosystem.config.js', cmdArgs3: '--env', cmdArgs4: 'production', cwdArgs : '/home/padmin/build/pm2_config', rbxcmd: 'forever',rbxArgs: 'restartall' }; 
