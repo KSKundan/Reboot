@@ -1,1 +1,0 @@
-module.exports ={ port :  process.env.PORT || 3200, ip : '172.16.50.175',pboxIP :'172.16.50.145', portPbox : process.env.PORT ||6010,pm2 :'pm2', restart :'restart', ecosystem:'ecosystem.config.js', env:'--env', production:'production', path : '/home/padmin/build/pm2_config',forever: 'forever',restartall: 'restartall' }; 
