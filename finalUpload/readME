@@ -15,6 +15,12 @@ executenow-
  For pBox:
  type, ip, jobid, minut, hour, date, month, day
  
+ monthely schedule case:-
+ scheduler will accept periodic value so if we schedule datewise then day value would be '*' and if we schedule daywise then
+ date value would be '*'
+ 
+ weekely schedule case:-
+ In this case both date value and month value would be '*'
  --------------------------------------------
  
  cancel-
