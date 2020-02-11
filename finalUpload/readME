@@ -1,1 +1,37 @@
+Require data for end points:-
+----------------------------------------------
+executenow-
+ For rBox:
+ user name, password, ip, type
+ 
+ For pBox:
+ type and ip
+ 
+ ---------------------------------------------
+ schedulenow-
+ For rBox:
+ type, ip, jobid, minut, hour, date, month, day
+ 
+ For pBox:
+ type, ip, jobid, minut, hour, date, month, day
+ 
+ --------------------------------------------
+ 
+ cancel-
+ For pBox-
+ type, jobid, ip
 
+ For rBox-
+ type, jobid, ip
+
+---------------------------------------------
+
+retrivenow-
+For all-
+type, rBox-ip pBox-ip , rBox-jobid and pBox-jobid
+
+For pBox-
+type, ip, jobid
+
+For rBox-
+type, ip, jobid
