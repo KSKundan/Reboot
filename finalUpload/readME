@@ -1,0 +1,43 @@
+Require data for end points:-
+----------------------------------------------
+executenow-
+ For rBox:
+ user name, password, ip, type
+ 
+ For pBox:
+ type and ip
+ 
+ ---------------------------------------------
+ schedulenow-
+ For rBox:
+ type, ip, jobid, minut, hour, date, month, day
+ 
+ For pBox:
+ type, ip, jobid, minut, hour, date, month, day
+ 
+ monthely schedule case:-
+ scheduler will accept periodic value so if we schedule datewise then day value would be '*' and if we schedule daywise then
+ date value would be '*'
+ 
+ weekely schedule case:-
+ In this case both date value and month value would be '*'
+ --------------------------------------------
+ 
+ cancel-
+ For pBox-
+ type, jobid, ip
+
+ For rBox-
+ type, jobid, ip
+
+---------------------------------------------
+
+retrivenow-
+For all-
+type, rBox-ip pBox-ip , rBox-jobid and pBox-jobid
+
+For pBox-
+type, ip, jobid
+
+For rBox-
+type, ip, jobid
